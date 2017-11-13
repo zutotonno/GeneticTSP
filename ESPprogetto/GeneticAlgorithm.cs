@@ -15,13 +15,13 @@ namespace ESPprogetto
         private MyPopulation initialPopulation;
         private MyMutation mutation;
         private double minDist;
-        private double BestFitness;
-        private double LastFitness;
+        private double BestDistance;
+        private double LastDistance;
         private int FitnessStagnation;
         private int stagnationTermination;
         private int sogliaStagnation;
         public double totalTIME { get; private set; }
-        public List<double> fitnessList { get; private set; }
+        public List<double> distanceList { get; private set; }
         public int genNUM { get; private set; }
         public GeneticAlgorithm(MyPopulation initialPopulation, MyMutation mutation, int genTermination, int elitismDim, int offspringDim, int populationSize, int chromoL, double minDist, int stagnation)
         {
@@ -33,7 +33,7 @@ namespace ESPprogetto
             this.populationSize = populationSize;
             this.chromosomeLenght = chromoL;
             this.minDist = minDist;
-            fitnessList = new List<double>();
+            distanceList = new List<double>();
             stagnationTermination = stagnation;
             sogliaStagnation = (int)Math.Round(stagnationTermination * 0.05);
         }
@@ -42,8 +42,8 @@ namespace ESPprogetto
         {
             var startTime = System.DateTime.Now;
             BestChromosome().calculateFitness();
-            BestFitness = BestChromosome().distance;
-            fitnessList.Add(BestFitness);
+            BestDistance= BestChromosome().distance;
+            distanceList.Add(BestDistance);
             var selected = MySelection.RouletteSelection(initialPopulation);
             genNUM = 0;
             FitnessStagnation = 0;
@@ -68,10 +68,10 @@ namespace ESPprogetto
                     aux.calculateFitness();
                     initialPopulation.population.Add(aux);
                 }
-                LastFitness = BestFitness;
-                BestFitness = BestChromosome(initialPopulation).distance;
-                fitnessList.Add(BestFitness);
-                if (LastFitness == BestFitness)
+                LastDistance = BestDistance;
+                BestDistance = BestChromosome(initialPopulation).distance;
+                distanceList.Add(BestDistance);
+                if (LastDistance == BestDistance)
                 {
                     LocalStagnation++;
                     FitnessStagnation++;

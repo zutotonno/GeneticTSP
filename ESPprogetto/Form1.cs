@@ -14,15 +14,15 @@ namespace ESPprogetto
     public partial class Form1 : Form
     {
         int seed = 1;
-        int numCities = 100;
+        int numCities = 50;
         int poison = 100000;
-        string name = "berlin";
+        string name = "TSPLIB repo name here: i.e berlin, att, etc..";
         public Form1()
         {
             InitializeComponent();
 
             var distanceMatrix = MatrixGenerator.Build(seed,numCities,poison); // creo la matrice delle distanze con una Factory
-            //var distanceMatrix = MatrixGenerator.Build(name,numCities,poison);
+            //var distanceMatrix = MatrixGenerator.Build(name,numCities,poison); // questo costruttore serve per il parsing delle istanze da TSPLIB
 
             var tourLenList = new List<double>();
             var tourMatList = new List< Tuple<Matrix<double>,List<string>> >();
@@ -52,9 +52,9 @@ namespace ESPprogetto
             var percentageFittest = 0.4; // la percentuale dei migliori sulla dimensione della popolazione selezionati per il Crossover
             var crossoverProbability = 1;
             var mutationProbability = 0.1;
-            var genTermination = 1000;
-            var stagnationTermination = 100;
-            var percentageElitism = 0.05 * percentageFittest; // indica la percentuale di popolazione che va direttamente nella nuova generazione. Il resto sarà generato da Crossover11
+            var genTermination = 100;
+            var stagnationTermination = 50;
+            var percentageElitism = 0.05 * percentageFittest; // indica la percentuale di popolazione che va direttamente nella nuova generazione. Il resto sarà generato da Crossover
 
 
             var fittestDim =  (int)Math.Round(populationSize * percentageFittest);
@@ -63,8 +63,9 @@ namespace ESPprogetto
 
             TourChromosome adam = new TourChromosome(numCities, distanceMatrix.Item1,distanceMatrix.Item2,distanceMatrix.Item3);
             MyPopulation initialPopulation = new MyPopulation(populationSize, adam);
-            /*Usare questo costruttore
-             per indurre un bias*///MyPopulation initialPopulation = new MyPopulation(populationSize,bestTourTuple.Item1,bestTourTuple.Item2, adam); // Biased Initial Population
+                                    /* Usare il costruttore di sotto
+                                        per indurre un bias */
+            //MyPopulation initialPopulation = new MyPopulation(populationSize,bestTourTuple.Item1,bestTourTuple.Item2, adam); // Biased Initial Population
             MySelection selection = new MySelection(fittestDim);
             Console.WriteLine();
             MyCrossover crossover = new MyCrossover(crossoverProbability);
@@ -97,7 +98,7 @@ namespace ESPprogetto
             chart2.Series.Add("startTourGA");
             chart2.Series.Add("nextCityGA");
             chart2.Series.Remove(chart2.Series["Series1"]);
-            var fitnessList = ga.fitnessList;
+            var distanceList = ga.distanceList;
             chart3.Series.Add("DistanceXGen");
             chart3.Series.Add("Greedy");
             chart3.Series.Remove(chart3.Series["Series1"]);
@@ -131,16 +132,16 @@ namespace ESPprogetto
             chart2.Series["tourGA"].Points.AddXY(best.GetGene(0).getXValue(), best.GetGene(0).getYValue());
 
 
-            for (int i = 0; i < fitnessList.Count; i++)
+            for (int i = 0; i < distanceList.Count; i++)
             {
-                chart3.Series["DistanceXGen"].Points.AddXY(i, fitnessList[i]);
-                chart4.Series["FitnessXGen"].Points.AddXY(i, (1/fitnessList[i]));
-                dataGridView1.Rows.Add(i,fitnessList[i],1/fitnessList[i]);
+                chart3.Series["DistanceXGen"].Points.AddXY(i, distanceList[i]);
+                chart4.Series["FitnessXGen"].Points.AddXY(i, (1/distanceList[i]));
+                dataGridView1.Rows.Add(i,distanceList[i],1/distanceList[i]);
 
             }
 
             chart3.Series["Greedy"].Points.AddXY(0, minDIST);
-            chart3.Series["Greedy"].Points.AddXY(fitnessList.Count, minDIST);
+            chart3.Series["Greedy"].Points.AddXY(distanceList.Count, minDIST);
 
 
             chart1.Series["cities"].ChartType =
